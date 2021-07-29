@@ -2,6 +2,8 @@ package com.koushik.usermanager.controller;
 
 import java.util.List;
 
+import com.koushik.usermanager.registration.RegistrationRequest;
+import com.koushik.usermanager.registration.RegistrationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import com.koushik.usermanager.service.UserService;
 @RequestMapping("api/v1/user-management")
 public class UserController {
 	private final UserService userService;
+	private final RegistrationService registrationService;
 
 	/*public UserController(UserService userService) {
 		super();
@@ -41,8 +44,8 @@ public class UserController {
 	}
 	
 	@PostMapping("/")
-	public ResponseEntity<User> addUser(@RequestBody User user){
-		User newUser = userService.addUser(user);
+	public ResponseEntity<User> addUser(@RequestBody RegistrationRequest user){
+		User newUser = registrationService.register(user);
 		return new ResponseEntity<>(newUser,HttpStatus.CREATED);
 	}
 	

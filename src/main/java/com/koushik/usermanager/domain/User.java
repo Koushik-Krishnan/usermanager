@@ -17,15 +17,7 @@ import javax.persistence.*;
 @Setter
 public class User implements Serializable {
 	@Id
-	@SequenceGenerator(
-			name = "user_sequence",
-			sequenceName = "user_sequence",
-			allocationSize = 1
-	                    )
-	@GeneratedValue(
-			strategy = GenerationType.SEQUENCE,
-	        generator = "user_sequence"
-	            )
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", nullable = false, updatable = false)
 	private Long id;
 	@Column
@@ -45,16 +37,14 @@ public class User implements Serializable {
 	private String userCode;
 	@Transient
 	private List<CustomField> customFields;
+	@Column
+	private String password;
 
-	public User(String firstName, String lastName, String phoneNumber, String email, Integer age, Roles roles, String userCode, List<CustomField> customFields) {
+	public User(String firstName, String lastName, String email, String password) {
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.phoneNumber = phoneNumber;
 		this.email = email;
-		this.age = age;
-		this.roles = roles;
-		this.userCode = userCode;
-		this.customFields = customFields;
+		this.password = password;
 	}
 }
 

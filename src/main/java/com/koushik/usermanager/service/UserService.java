@@ -25,14 +25,14 @@ public class UserService{
 		this.bCryptPasswordEncoder = bCryptPasswordEncoder ;
 	}*/
 
-	public User addUser(User user) {
+	/*public User addUser(User user) {
 		user.setUserCode(UUID.randomUUID().toString());
 		for (CustomField customField : user.getCustomFields()) {
 			System.out.println("Name:" + customField.getName());
 			System.out.println("Value:" + customField.getValue());
 		}
 		return userRepo.save(user);
-	}
+	}*/
 
 	public List<User> findAllUser() {
 		return userRepo.findAll();
@@ -48,6 +48,18 @@ public class UserService{
 
 	public User findUserById(Long id) {
 		return userRepo.findUserById(id).orElseThrow(() -> new UserNotFoundException("User by id" + id + "was not found"));
+	}
+
+	public User signUpUser(User user){
+		boolean userExists = userRepo.findUserByEmail(user.getEmail()).isPresent();
+
+		if(userExists){
+			throw new IllegalStateException("email already taken");
+		}
+		else {
+			user.setUserCode(UUID.randomUUID().toString());
+			return userRepo.save(user);
+		}
 	}
 }
 
