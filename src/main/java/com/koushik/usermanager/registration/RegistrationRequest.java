@@ -1,5 +1,6 @@
 package com.koushik.usermanager.registration;
 
+import com.koushik.usermanager.domain.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

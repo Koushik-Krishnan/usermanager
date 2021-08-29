@@ -1,12 +1,16 @@
 package com.koushik.usermanager.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import com.koushik.usermanager.domain.CustomField;
+import com.koushik.usermanager.registration.token.ConfirmationToken;
+import com.koushik.usermanager.registration.token.ConfirmationTokenService;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.koushik.usermanager.domain.User;
@@ -15,8 +19,12 @@ import com.koushik.usermanager.userrepository.UserRepository;
 
 @Service
 @AllArgsConstructor
-public class UserService{
+public class UserService implements UserDetailsService {
+
+	private final static String USER_NOT_FOUND_MESSAGE = "user with email %s not found";
 	private final UserRepository userRepo;
+	private final BCryptPasswordEncoder bCryptPasswordEncoder;
+	private final ConfirmationTokenService confirmationTokenService;
 
 	/*@Autowired
 	public UserService(UserRepository userRepo,BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -50,16 +58,39 @@ public class UserService{
 		return userRepo.findUserById(id).orElseThrow(() -> new UserNotFoundException("User by id" + id + "was not found"));
 	}
 
-	public User signUpUser(User user){
+	public User signUpUser(User  user) {
 		boolean userExists = userRepo.findUserByEmail(user.getEmail()).isPresent();
 
-		if(userExists){
+		if (userExists) {
 			throw new IllegalStateException("email already taken");
-		}
-		else {
+		} else {
+			String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
+			user.setPassword(encodedPassword.toString());
+			System.out.println("encoded password:" + encodedPassword);
 			user.setUserCode(UUID.randomUUID().toString());
-			return userRepo.save(user);
+			userRepo.save(user);
+
+			String token = UUID.randomUUID().toString();
+			ConfirmationToken confirmationToken = new ConfirmationToken(
+					token,
+					LocalDateTime.now(),
+					LocalDateTime.now().plusMinutes(15),
+					user
+			);
+			confirmationTokenService.saveConfirmationToken(confirmationToken);
+			System.out.println("confirmation token:"+token);
 		}
+		return user;
+	}
+
+		@Override
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		return userRepo.findUserByEmail(email)
+				.orElseThrow(()-> new UserNotFoundException(String.format(USER_NOT_FOUND_MESSAGE,email)));
+	}
+
+	public int enableUser(String email) {
+		return userRepo.enableUser(email);
 	}
 }
 

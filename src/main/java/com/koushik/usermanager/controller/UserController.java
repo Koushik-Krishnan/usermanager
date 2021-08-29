@@ -1,20 +1,14 @@
 package com.koushik.usermanager.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.koushik.usermanager.registration.RegistrationRequest;
 import com.koushik.usermanager.registration.RegistrationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.koushik.usermanager.domain.User;
 import com.koushik.usermanager.service.UserService;
@@ -38,7 +32,7 @@ public class UserController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<User> getAllUserById(@PathVariable("id")Long id){
+	public ResponseEntity<User> getAllUserById(@PathVariable("id") Long id){
 		User user = userService.findUserById(id);
 		return new ResponseEntity<>(user,HttpStatus.OK);
 	}
@@ -60,4 +54,9 @@ public class UserController {
 		userService.deleteUser(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 		}
+
+	@GetMapping(path = "confirm")
+	public String confirm(@RequestParam("token") String token) {
+		return registrationService.confirmToken(token);
+	}
 }
